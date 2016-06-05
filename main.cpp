@@ -143,7 +143,7 @@ void CalibrateSkeleton()
     struct tm *local = localtime(&nowtime);
     
     char buf[256];
-    sprintf(buf, "/Users/mingfenwang/Desktop/%d-%d-%d-%d-%d-%d.bvh", local->tm_year+1900, local->tm_mon+1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
+    sprintf(buf, "%d-%d-%d-%d-%d-%d.bvh", local->tm_year+1900, local->tm_mon+1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
     if (m_pKinectBVH->CreateBVHFile(buf))
     {
         for (int i = 0; i < (nite::JOINT_RIGHT_FOOT+1); i++) {
