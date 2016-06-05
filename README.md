@@ -23,7 +23,7 @@ Enter the Kinect camera's viewport, perform actions, then leave the viewport, re
 1.[Derek Hendrickx's KinectMotionCapture](https://github.com/derekhendrickx/KinectMotionCapture)<br/>
 2.[Kyle Weicht's 3D math library](https://github.com/awesomekyle/math)<br/>
 3.[Birdy's Notebook](http://bediyap.com/programming/convert-quaternion-to-euler-rotations/)<br/>
-4.[sunchy's Kinect_to_BVH_Console](https://github.com/isunchy/Kinect_to_BVH_Console)
+4.[sunchy's Kinect_to_BVH_Console](https://github.com/isunchy/Kinect_to_BVH_Console)<br/>
 5.[Rishad Bharucha's openni-nite-opencv-xcode](https://github.com/rishadbharucha/openni-nite-opencv-xcode)
 ### License
 The MIT License (MIT)
