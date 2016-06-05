@@ -11,10 +11,12 @@ NITE2<br/>
 OpenCV2<br/>
 Xcode 7.3.1
 ### How to use
-1.Install OpenNI2, NITE2, OpenCV2.<br/>
-2.Plug kinect for xbox 360.<br/>
-3.Install Xcode 7.3.1.<br/>
-4.Open the project, build and run.<br/>
+1.Git clone [openni-nite-opencv-xcode](https://github.com/rishadbharucha/openni-nite-opencv-xcode).<br/>
+2.Install OpenCV2.<br/>
+3.Copy the source codes to 'OpenNI+NITE+OpenCV'.<br/>
+4.Copy libFreenectDriver.dylib to 'OpenNI2/Drivers', also add it to copy files.<br/>
+5.Plug kinect for xbox 360.<br/>
+6.Open the project, build and run.<br/>
 <br/>
 When the Kinect camera detects your body, the software will automatically record the skeleton animation to a bvh file, after the Kinect camera can not detect your body, the software will finish recording the bvh file, the output path is the current directory.<br/>
 <br/>
