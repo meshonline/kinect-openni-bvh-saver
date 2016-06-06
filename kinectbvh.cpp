@@ -91,23 +91,17 @@ void KinectBVH::CreateSkeletonInformation()
 
 		// Spine
     flux << "\tOFFSET " << m_aOffsets[nite::JOINT_TORSO].x << " " << m_aOffsets[nite::JOINT_TORSO].y << " " << m_aOffsets[nite::JOINT_TORSO].z << endl;
-		flux << "\tCHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation" << endl;
-		//flux << "\tJOINT Spine" << endl;
-		//flux << "\t{" << endl;
-
-			// Shoulder Center
-            //flux << "\t\tOFFSET " << -m_aOffsets[nite::JOINT_NECK].x << " " << m_aOffsets[nite::JOINT_NECK].y << " " << m_aOffsets[nite::JOINT_NECK].z << endl;
-			//flux << "\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+		flux << "\tCHANNELS 6 Xposition Yposition Zposition Zrotation Yrotation Xrotation" << endl;
 			flux << "\t\tJOINT ShoulderCenter" << endl;
 			flux << "\t\t{" << endl;
 				// Head
 				flux << "\t\t\tOFFSET " << m_aOffsets[nite::JOINT_NECK].x << " " << m_aOffsets[nite::JOINT_NECK].y << " " << m_aOffsets[nite::JOINT_NECK].z << endl;
-				flux << "\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+				flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 				flux << "\t\t\tJOINT Head" << endl;
 				flux << "\t\t\t{" << endl;
 					// End Site
 					flux << "\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_HEAD].x << " " << m_aOffsets[nite::JOINT_HEAD].y << " " << m_aOffsets[nite::JOINT_HEAD].z << endl;
-					flux << "\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+					flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 					flux << "\t\t\t\tEnd Site" << endl;
 					flux << "\t\t\t\t{" << endl;
 						flux << "\t\t\t\t\tOFFSET 0.0 " << 8.91 << " 0.0" << endl;
@@ -119,27 +113,21 @@ void KinectBVH::CreateSkeletonInformation()
 				flux << "\t\t\t{" << endl;
 					// Elbow Left
                     flux << "\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_LEFT_SHOULDER].x << " " << m_aOffsets[nite::JOINT_LEFT_SHOULDER].y << " " << m_aOffsets[nite::JOINT_LEFT_SHOULDER].z << endl;
-					flux << "\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+					flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 					flux << "\t\t\t\tJOINT ElbowLeft" << endl;
 					flux << "\t\t\t\t{" << endl;
 						// Wrist Left
                         flux << "\t\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_LEFT_ELBOW].x << " " << m_aOffsets[nite::JOINT_LEFT_ELBOW].y << " " << m_aOffsets[nite::JOINT_LEFT_ELBOW].z << endl;
-						flux << "\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+						flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 						flux << "\t\t\t\t\tJOINT WristLeft" << endl;
 						flux << "\t\t\t\t\t{" << endl;
 							// Hand Left
                             flux << "\t\t\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_LEFT_HAND].x << " " << m_aOffsets[nite::JOINT_LEFT_HAND].y << " " << m_aOffsets[nite::JOINT_LEFT_HAND].z << endl;
-							flux << "\t\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
-							//flux << "\t\t\t\t\t\tJOINT HandLeft" << endl;
-							//flux << "\t\t\t\t\t\t{" << endl;
-								// End Site
-								//flux << "\t\t\t\t\t\t\tOFFSET " << -m_aOffsets[7].x << " " << m_aOffsets[7].y << " " << m_aOffsets[7].z << endl;
-								//flux << "\t\t\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+							flux << "\t\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 								flux << "\t\t\t\t\t\t\tEnd Site" << endl;
 								flux << "\t\t\t\t\t\t\t{" << endl;
 									flux << "\t\t\t\t\t\t\t\tOFFSET -8.32 0.0 0.0" << endl;
 								flux << "\t\t\t\t\t\t\t}" << endl;
-							//flux << "\t\t\t\t\t\t}" << endl;
 						flux << "\t\t\t\t\t}" << endl;
 					flux << "\t\t\t\t}" << endl;
 				flux << "\t\t\t}" << endl;
@@ -149,34 +137,26 @@ void KinectBVH::CreateSkeletonInformation()
 				flux << "\t\t\t{" << endl;
 					// Elbow Right
                     flux << "\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_RIGHT_SHOULDER].x << " " << m_aOffsets[nite::JOINT_RIGHT_SHOULDER].y << " " << m_aOffsets[nite::JOINT_RIGHT_SHOULDER].z << endl;
-					flux << "\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+					flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 					flux << "\t\t\t\tJOINT ElbowRight" << endl;
 					flux << "\t\t\t\t{" << endl;
 						// Wrist Right
                         flux << "\t\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_RIGHT_ELBOW].x << " " << m_aOffsets[nite::JOINT_RIGHT_ELBOW].y << " " << m_aOffsets[nite::JOINT_RIGHT_ELBOW].z << endl;
-						flux << "\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+						flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 						flux << "\t\t\t\t\tJOINT WristRight" << endl;
 						flux << "\t\t\t\t\t{" << endl;
 							// Hand Right
                             flux << "\t\t\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_RIGHT_HAND].x << " " << m_aOffsets[nite::JOINT_RIGHT_HAND].y << " " << m_aOffsets[nite::JOINT_RIGHT_HAND].z << endl;
-							flux << "\t\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
-							//flux << "\t\t\t\t\t\tJOINT HandRight" << endl;
-							//flux << "\t\t\t\t\t\t{" << endl;
-								// End Site
-								//flux << "\t\t\t\t\t\t\tOFFSET " << -m_aOffsets[11].x << " " << m_aOffsets[11].y << " " << m_aOffsets[11].z << endl;
-								//flux << "\t\t\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+							flux << "\t\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 								flux << "\t\t\t\t\t\t\tEnd Site" << endl;
 								flux << "\t\t\t\t\t\t\t{" << endl;
 									flux << "\t\t\t\t\t\t\t\tOFFSET 8.32 0.0 0.0" << endl;
 								flux << "\t\t\t\t\t\t\t}" << endl;
-							//flux << "\t\t\t\t\t\t}" << endl;
 						flux << "\t\t\t\t\t}" << endl;
 					flux << "\t\t\t\t}" << endl;
 				flux << "\t\t\t}" << endl;
 			
 			flux << "\t\t}" << endl;
-
-		//flux << "\t}" << endl;
 
 		// Hip Left
 		flux << "\tJOINT HipLeft" << endl;
@@ -184,30 +164,23 @@ void KinectBVH::CreateSkeletonInformation()
 
 			// Knee Left
         flux << "\t\tOFFSET " << m_aOffsets[nite::JOINT_LEFT_HIP].x << " " << m_aOffsets[nite::JOINT_LEFT_HIP].y << " " << m_aOffsets[nite::JOINT_LEFT_HIP].z << endl;
-			flux << "\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+			flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 			flux << "\t\tJOINT KneeLeft" << endl;
 			flux << "\t\t{" << endl;
 
 				// Ankle Left
 				flux << "\t\t\tOFFSET " << m_aOffsets[nite::JOINT_LEFT_KNEE].x << " " << m_aOffsets[nite::JOINT_LEFT_KNEE].y << " " << m_aOffsets[nite::JOINT_LEFT_KNEE].z << endl;
-				flux << "\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+				flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 				flux << "\t\t\tJOINT AnkleLeft" << endl;
 				flux << "\t\t\t{" << endl;
 
 					// Foot Left
                     flux << "\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_LEFT_FOOT].x << " " << m_aOffsets[nite::JOINT_LEFT_FOOT].y << " " << m_aOffsets[nite::JOINT_LEFT_FOOT].z << endl;
-					flux << "\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
-					//flux << "\t\t\t\tJOINT FootLeft" << endl;
-					//flux << "\t\t\t\t{" << endl;
-					
-						// End Site
-						//flux << "\t\t\t\t\tOFFSET " << -m_aOffsets[15].x << " " << m_aOffsets[15].y << " " << m_aOffsets[15].z << endl;
-						//flux << "\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+					flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 						flux << "\t\t\t\t\tEnd Site" << endl;
 						flux << "\t\t\t\t\t{" << endl;
 							flux << "\t\t\t\t\t\tOFFSET 0.0 0.0 8.91" << endl;
 						flux << "\t\t\t\t\t}" << endl;	
-					//flux << "\t\t\t\t}" << endl;
 				flux << "\t\t\t}" << endl;
 			flux << "\t\t}" << endl;
 		flux << "\t}" << endl;
@@ -218,30 +191,23 @@ void KinectBVH::CreateSkeletonInformation()
 
 			// Knee Right
 			flux << "\t\tOFFSET " << m_aOffsets[nite::JOINT_RIGHT_HIP].x << " " << m_aOffsets[nite::JOINT_RIGHT_HIP].y << " " << m_aOffsets[nite::JOINT_RIGHT_HIP].z << endl;
-			flux << "\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+			flux << "\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 			flux << "\t\tJOINT KneeRight" << endl;
 			flux << "\t\t{" << endl;
 
 				// Ankle Right
 				flux << "\t\t\tOFFSET " << m_aOffsets[nite::JOINT_RIGHT_KNEE].x << " " << m_aOffsets[nite::JOINT_RIGHT_KNEE].y << " " << m_aOffsets[nite::JOINT_RIGHT_KNEE].z << endl;
-				flux << "\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+				flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 				flux << "\t\t\tJOINT AnkleRight" << endl;
 				flux << "\t\t\t{" << endl;
 
 					// Foot Right
 					flux << "\t\t\t\tOFFSET " << m_aOffsets[nite::JOINT_RIGHT_FOOT].x << " " << m_aOffsets[nite::JOINT_RIGHT_FOOT].y << " " << m_aOffsets[nite::JOINT_RIGHT_FOOT].z << endl;
-					flux << "\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
-					//flux << "\t\t\t\tJOINT FootRight" << endl;
-					//flux << "\t\t\t\t{" << endl;
-					
-						// End Site
-						//flux << "\t\t\t\t\tOFFSET " << -m_aOffsets[19].x << " " << m_aOffsets[19].y << " " << m_aOffsets[19].z << endl;
-						//flux << "\t\t\t\t\tCHANNELS 3 Zrotation Xrotation Yrotation" << endl;
+					flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
 						flux << "\t\t\t\t\tEnd Site" << endl;
 						flux << "\t\t\t\t\t{" << endl;
 							flux << "\t\t\t\t\t\tOFFSET 0.0 0.0 8.91" << endl;
 						flux << "\t\t\t\t\t}" << endl;	
-					//flux << "\t\t\t\t}" << endl;
 				flux << "\t\t\t}" << endl;
 			flux << "\t\t}" << endl;
 		flux << "\t}" << endl;
@@ -303,7 +269,7 @@ Vec_Math::Vec3 KinectBVH::GetEulers(KinectJoint *joints, int idx)
     // calculate between quaternion
 	Vec_Math::Quaternion q_delta = Vec_Math::quat_left_multiply(q_current, Vec_Math::quat_inverse(q_parent));
 
-	// convert the quaternion to euler angles by default roll->pitch->yaw order, which roll is outer, yaw is inner.
+	// convert the quaternion to euler angles by roll->yaw->pitch order, which roll is outer, pitch is inner.
     Vec_Math::Vec3 ret = Vec_Math::euler_from_quat(q_delta);
 
     return ret;
@@ -312,7 +278,7 @@ Vec_Math::Vec3 KinectBVH::GetEulers(KinectJoint *joints, int idx)
 void KinectBVH::WriteJoint(stringstream& flux, KinectJoint *joints, nite::JointType j)
 {
     Vec_Math::Vec3 angles = GetEulers(joints, j);
-    flux << angles.z * Vec_Math::kRadToDeg << " " << angles.x * Vec_Math::kRadToDeg << " " << angles.y * Vec_Math::kRadToDeg << " ";
+    flux << angles.z * Vec_Math::kRadToDeg << " " << angles.y * Vec_Math::kRadToDeg << " " << angles.x * Vec_Math::kRadToDeg << " ";
 }
 
 /**
