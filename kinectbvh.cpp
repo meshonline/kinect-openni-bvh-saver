@@ -269,9 +269,14 @@ Vec_Math::Vec3 KinectBVH::GetEulers(KinectJoint *joints, int idx)
     // calculate between quaternion
 	Vec_Math::Quaternion q_delta = Vec_Math::quat_left_multiply(q_current, Vec_Math::quat_inverse(q_parent));
 
-	// convert the quaternion to euler angles by roll->yaw->pitch order, which roll is outer, pitch is inner.
+    // convert the quaternion to euler angles by roll->yaw->pitch order, which roll is outer, pitch is inner.
     Vec_Math::Vec3 ret = Vec_Math::euler_from_quat(q_delta);
 
+    // adjust kinect angle slightly
+    if (idx == nite::JOINT_TORSO) {
+        ret.x -= 10.f * Vec_Math::kDegToRad;
+    }
+    
     return ret;
 }
 
