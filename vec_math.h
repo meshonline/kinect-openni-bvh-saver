@@ -1219,7 +1219,7 @@ namespace Vec_Math {
 		};
 		return q;
 	}
-    // roll->pitch->yaw order, which roll is outer, yaw is inner.
+    // roll->yaw->pitch order, which roll is outer, pitch is inner.
 	INLINE Quaternion quat_from_euler(float pitch, float yaw, float roll)
 	{
 		float x = pitch/2;
@@ -1244,7 +1244,7 @@ namespace Vec_Math {
 
 		return q;
 	}
-    // roll->pitch->yaw order, which roll is outer, yaw is inner.
+    // roll->yaw->pitch order, which roll is outer, pitch is inner.
     INLINE Vec3 euler_from_quat(QUAT_INPUT q)
     {
         Vec3 ret;
