@@ -167,6 +167,13 @@ void ProcessBonesOrientation(const nite::Skeleton &skel)
     for (int i = 0; i < (nite::JOINT_RIGHT_FOOT+1); i++)
     {
         joints[i].quat = skel.getJoint((nite::JointType)i).getOrientation();
+        // convert to right hand coordinate
+        joints[i].quat.x = -joints[i].quat.x;
+        joints[i].quat.y = -joints[i].quat.y;
+
+        joints[i].pos = skel.getJoint((nite::JointType)i).getPosition();
+        // convert to right hand coordinate
+        joints[i].pos.z = -joints[i].pos.z;
     }
     
     m_pKinectBVH->AddBonesOrientation(joints);
