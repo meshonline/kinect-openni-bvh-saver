@@ -72,6 +72,11 @@ bool KinectBVH::CreateBVHFile(string filename)
 */
 void KinectBVH::FillBVHFile()
 {
+    const bool use_built_in_quaternion = false;
+    if (!use_built_in_quaternion) {
+        CorrectKinect();
+        CreateQuaternionInformation();
+    }
 	CreateSkeletonInformation();
 	CreateMotionInformation();
 	m_pFile.close();
@@ -254,27 +259,27 @@ Vec_Math::Vec3 KinectBVH::GetEulers(KinectJoint *joints, int idx)
     if (idx == nite::JOINT_TORSO) {
         q_parent = Vec_Math::quat_identity;
     } else {
-        q_parent = Vec_Math::vec4_create(-joints[parent_joint_map[idx]].quat.x,
-                                         -joints[parent_joint_map[idx]].quat.y,
+        q_parent = Vec_Math::vec4_create(joints[parent_joint_map[idx]].quat.x,
+                                         joints[parent_joint_map[idx]].quat.y,
                                          joints[parent_joint_map[idx]].quat.z,
                                          joints[parent_joint_map[idx]].quat.w);
     }
 
     // get joint's quaternion, convert to right hand coordinate
-    Vec_Math::Quaternion q_current = Vec_Math::vec4_create(-joints[idx].quat.x,
-                                                           -joints[idx].quat.y,
+    Vec_Math::Quaternion q_current = Vec_Math::vec4_create(joints[idx].quat.x,
+                                                           joints[idx].quat.y,
                                                            joints[idx].quat.z,
                                                            joints[idx].quat.w);
 
     // calculate between quaternion
 	Vec_Math::Quaternion q_delta = Vec_Math::quat_left_multiply(q_current, Vec_Math::quat_inverse(q_parent));
 
-    // convert the quaternion to euler angles by roll->yaw->pitch order, which roll is outer, pitch is inner.
+	// convert the quaternion to euler angles by roll->yaw->pitch order, which roll is outer, pitch is inner.
     Vec_Math::Vec3 ret = Vec_Math::euler_from_quat(q_delta);
 
     // adjust kinect angle slightly
     if (idx == nite::JOINT_TORSO) {
-        ret.x -= 10.f * Vec_Math::kDegToRad;
+//        ret.x -= 10.f * Vec_Math::kDegToRad;
     }
     
     return ret;
@@ -321,4 +326,306 @@ void KinectBVH::CreateMotionInformation()
 	}
 
 	m_pFile << flux.str();
+}
+
+void KinectBVH::CorrectKinect()
+{
+    // kinect's pitch angle
+    const float kinect_angle = -6.f;
+    Vec_Math::Mat3 correct_matrix = Vec_Math::mat3_rotation_x(kinect_angle * Vec_Math::kDegToRad);
+    
+    Vec_Math::Vec3 one_pos;
+    for (int i = 0; i < static_cast<int>(m_vPositions.size()); i++) {
+        one_pos.x = m_vPositions[i].x;
+        one_pos.y = m_vPositions[i].y;
+        one_pos.z = m_vPositions[i].z;
+
+        one_pos = Vec_Math::mat3_mul_vector(one_pos, correct_matrix);
+
+        m_vPositions[i].x = one_pos.x;
+        m_vPositions[i].y = one_pos.y;
+        m_vPositions[i].z = one_pos.z;
+
+        KinectJoint *joints = &m_vBonesOrientation[i * (nite::JOINT_RIGHT_FOOT+1)];
+        for (int j=0; j<nite::JOINT_RIGHT_FOOT+1; j++) {
+            one_pos.x = joints[j].pos.x;
+            one_pos.y = joints[j].pos.y;
+            one_pos.z = joints[j].pos.z;
+
+            one_pos = Vec_Math::mat3_mul_vector(one_pos, correct_matrix);
+
+            joints[j].pos.x = one_pos.x;
+            joints[j].pos.y = one_pos.y;
+            joints[j].pos.z = one_pos.z;
+        }
+    }
+}
+
+void KinectBVH::CreateQuaternionInformation()
+{
+    // we save last stable x axis for each joint to avoid trembling
+    Vec_Math::Vec3 last_stable_vx[nite::JOINT_RIGHT_FOOT+1];
+    for (int i=0; i<nite::JOINT_RIGHT_FOOT+1; i++) {
+        last_stable_vx[i] = Vec_Math::vec3_zero;
+    }
+
+    // loop through all records
+    for (int i = 0; i < static_cast<int>(m_vPositions.size()); i++) {
+        KinectJoint *joints = &m_vBonesOrientation[i * (nite::JOINT_RIGHT_FOOT+1)];
+
+        const float MAX_STABLE_DOT = 0.925f;
+        float dot;
+        nite::Point3f p1, p2;
+        Vec_Math::Vec3 v1, v2;
+        Vec_Math::Vec3 vx, vy, vz;
+        Vec_Math::Vec3 v_body_x;
+        Vec_Math::Mat3 m, mr;
+        Vec_Math::Quaternion q;
+
+        // JOINT_TORSO
+        p1 = joints[nite::JOINT_LEFT_HIP].pos;
+        p2 = joints[nite::JOINT_RIGHT_HIP].pos;
+        vx = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_TORSO].pos;
+        p2 = joints[nite::JOINT_NECK].pos;
+        vy = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_TORSO].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // save body's x axis for later use
+        v_body_x = vx;
+        
+        // JOINT_NECK
+        p1 = joints[nite::JOINT_LEFT_SHOULDER].pos;
+        p2 = joints[nite::JOINT_RIGHT_SHOULDER].pos;
+        vx = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_NECK].pos;
+        p2 = joints[nite::JOINT_HEAD].pos;
+        vy = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_NECK].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_HEAD
+        joints[nite::JOINT_HEAD].quat = joints[nite::JOINT_NECK].quat;
+
+        // JOINT_LEFT_SHOULDER
+        p1 = joints[nite::JOINT_LEFT_SHOULDER].pos;
+        p2 = joints[nite::JOINT_LEFT_ELBOW].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_LEFT_ELBOW].pos;
+        p2 = joints[nite::JOINT_LEFT_HAND].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_LEFT_SHOULDER];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            last_stable_vx[nite::JOINT_LEFT_SHOULDER] = vx;
+        }
+        vy = v1;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_LEFT_SHOULDER].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_LEFT_ELBOW
+        p1 = joints[nite::JOINT_LEFT_SHOULDER].pos;
+        p2 = joints[nite::JOINT_LEFT_ELBOW].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_LEFT_ELBOW].pos;
+        p2 = joints[nite::JOINT_LEFT_HAND].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_LEFT_ELBOW];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            last_stable_vx[nite::JOINT_LEFT_ELBOW] = vx;
+        }
+        vy = v2;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_LEFT_ELBOW].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+
+        // JOINT_LEFT_HAND
+        joints[nite::JOINT_LEFT_HAND].quat = joints[nite::JOINT_LEFT_ELBOW].quat;
+        
+        // JOINT_RIGHT_SHOULDER
+        p1 = joints[nite::JOINT_RIGHT_SHOULDER].pos;
+        p2 = joints[nite::JOINT_RIGHT_ELBOW].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_RIGHT_ELBOW].pos;
+        p2 = joints[nite::JOINT_RIGHT_HAND].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_RIGHT_SHOULDER];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            last_stable_vx[nite::JOINT_RIGHT_SHOULDER] = vx;
+        }
+        vy = v1;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_RIGHT_SHOULDER].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_RIGHT_ELBOW
+        p1 = joints[nite::JOINT_RIGHT_SHOULDER].pos;
+        p2 = joints[nite::JOINT_RIGHT_ELBOW].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_RIGHT_ELBOW].pos;
+        p2 = joints[nite::JOINT_RIGHT_HAND].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_RIGHT_ELBOW];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            last_stable_vx[nite::JOINT_RIGHT_ELBOW] = vx;
+        }
+        vy = v2;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_RIGHT_ELBOW].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_RIGHT_HAND
+        joints[nite::JOINT_RIGHT_HAND].quat = joints[nite::JOINT_RIGHT_ELBOW].quat;
+        
+        // JOINT_LEFT_HIP
+        p1 = joints[nite::JOINT_LEFT_HIP].pos;
+        p2 = joints[nite::JOINT_LEFT_KNEE].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_LEFT_KNEE].pos;
+        p2 = joints[nite::JOINT_LEFT_FOOT].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_LEFT_HIP];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            // reverse the direction because knees can only bend to back
+            vx = Vec_Math::vec3_negate(vx);
+            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
+            // bend forward
+            if (dot > 0) {
+                vx = Vec_Math::vec3_negate(vx);
+            }
+            last_stable_vx[nite::JOINT_LEFT_HIP] = vx;
+        }
+        vy = v1;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_LEFT_HIP].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_LEFT_KNEE
+        p1 = joints[nite::JOINT_LEFT_HIP].pos;
+        p2 = joints[nite::JOINT_LEFT_KNEE].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_LEFT_KNEE].pos;
+        p2 = joints[nite::JOINT_LEFT_FOOT].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_LEFT_KNEE];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            // reverse the direction because knees can only bend to back
+            vx = Vec_Math::vec3_negate(vx);
+            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
+            // bend forward
+            if (dot > 0) {
+                vx = Vec_Math::vec3_negate(vx);
+            }
+            last_stable_vx[nite::JOINT_LEFT_KNEE] = vx;
+        }
+        vy = v2;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_LEFT_KNEE].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_LEFT_FOOT
+        joints[nite::JOINT_LEFT_FOOT].quat = joints[nite::JOINT_LEFT_KNEE].quat;
+        
+        // JOINT_RIGHT_HIP
+        p1 = joints[nite::JOINT_RIGHT_HIP].pos;
+        p2 = joints[nite::JOINT_RIGHT_KNEE].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_RIGHT_KNEE].pos;
+        p2 = joints[nite::JOINT_RIGHT_FOOT].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_RIGHT_HIP];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            // reverse the direction because knees can only bend to back
+            vx = Vec_Math::vec3_negate(vx);
+            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
+            // bend forward
+            if (dot > 0) {
+                vx = Vec_Math::vec3_negate(vx);
+            }
+            last_stable_vx[nite::JOINT_RIGHT_HIP] = vx;
+        }
+        vy = v1;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_RIGHT_HIP].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_RIGHT_KNEE
+        p1 = joints[nite::JOINT_RIGHT_HIP].pos;
+        p2 = joints[nite::JOINT_RIGHT_KNEE].pos;
+        v1 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        p1 = joints[nite::JOINT_RIGHT_KNEE].pos;
+        p2 = joints[nite::JOINT_RIGHT_FOOT].pos;
+        v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
+        dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        if (fabsf(dot) > MAX_STABLE_DOT) {
+            vx = last_stable_vx[nite::JOINT_RIGHT_KNEE];
+        } else {
+            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+            // reverse the direction because knees can only bend to back
+            vx = Vec_Math::vec3_negate(vx);
+            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
+            // bend forward
+            if (dot > 0) {
+                vx = Vec_Math::vec3_negate(vx);
+            }
+            last_stable_vx[nite::JOINT_RIGHT_KNEE] = vx;
+        }
+        vy = v2;
+        vz = Vec_Math::vec3_zero;
+        m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
+        m = Vec_Math::mat3_multiply(mr, m);
+        q = Vec_Math::quat_from_mat3(m);
+        joints[nite::JOINT_RIGHT_KNEE].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
+        
+        // JOINT_RIGHT_FOOT
+        joints[nite::JOINT_RIGHT_FOOT].quat = joints[nite::JOINT_RIGHT_KNEE].quat;
+    }
 }
