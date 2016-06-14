@@ -18,6 +18,7 @@ using namespace std;
 struct KinectJoint
 {
     nite::Quaternion quat;
+    nite::Point3f pos;
 };
 
 /**
@@ -87,6 +88,8 @@ private:
 	* G閚鑢e les donn閑s des mouvements pour le BVH
 	*/
 	void CreateMotionInformation();
+    void CorrectKinect();
+    void CreateQuaternionInformation();
 };
 
 #endif // KINECTBVH_H
