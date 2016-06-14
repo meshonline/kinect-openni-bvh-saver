@@ -2,7 +2,11 @@
 # kinect-openni-bvh-saver
 This project is based on OpenNI2, NITE2, and OpenCV2, it will automatically save many skeleton animation clips to bvh files.<br/>
 <br/>
-Then you can import the bvh files into Blender or other softwares to smooth animation curves. I use Blender's default smooth key setting to smooth all rotation channels, the results is acceptable.
+Then you can import the bvh files into Blender or other softwares to smooth animation curves. I use Blender's default smooth key setting to smooth all rotation channels, the results is acceptable.<br/>
+<br/>
+You can turn your body around 360 degrees with this project, I am very satisfied with the result.<br/>
+<br/>
+Though the project is developed on Mac OS X, you can port it to Linux, Windows easily, for the source code is portable.
 ### Requirements
 Mac OS X 10.11<br/>
 kinect for xbox 360<br/>
