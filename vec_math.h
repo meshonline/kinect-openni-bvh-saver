@@ -729,6 +729,29 @@ namespace Vec_Math {
 		swapf(result.r1.z, result.r2.y);
 		return result;
 	}
+    INLINE Mat3 mat3_from_axis(VEC3_INPUT vx, VEC3_INPUT vy, VEC3_INPUT vz)
+    {
+        Mat3 m = mat3_identity;
+        // YZ plane
+        if (vx.x == 0 && vx.y == 0 && vx.z == 0) {
+            m.r1 = vec3_normalize(vy);
+            m.r0 = vec3_normalize(vec3_cross(vy, vz));
+            m.r2 = vec3_normalize(vec3_cross(m.r0, m.r1));
+        }
+        // XZ plane
+        if (vy.x == 0 && vy.y == 0 && vy.z == 0) {
+            m.r0 = vec3_normalize(vx);
+            m.r1 = vec3_normalize(vec3_cross(vz, vx));
+            m.r2 = vec3_normalize(vec3_cross(m.r0, m.r1));
+        }
+        // XY plane
+        if (vz.x == 0 && vz.y == 0 && vz.z == 0) {
+            m.r1 = vec3_normalize(vy);
+            m.r2 = vec3_normalize(vec3_cross(vec3_normalize(vx), m.r1));
+            m.r0 = vec3_normalize(vec3_cross(m.r1, m.r2));
+        }
+        return m;
+    }
 	INLINE Mat3 mat3_inverse(MAT3_INPUT m)
 	{
 		float det = mat3_determinant(m);
@@ -1184,6 +1207,42 @@ namespace Vec_Math {
 			2*(xz+yw),     2*(yz-xw), 1 - 2*(xx+yy));
 		return ret;
 	}
+    INLINE Quaternion quat_from_mat3(MAT3_INPUT m)
+    {
+        // this function needs colume order
+        Mat3 a = mat3_transpose(m);
+
+        Quaternion q;
+        float trace = a.r0.x + a.r1.y + a.r2.z;
+        if( trace > 0 ) {
+            float s = 0.5f / sqrtf(trace+ 1.0f);
+            q.w = 0.25f / s;
+            q.x = ( a.r2.y - a.r1.z ) * s;
+            q.y = ( a.r0.z - a.r2.x ) * s;
+            q.z = ( a.r1.x - a.r0.y ) * s;
+        } else {
+            if ( a.r0.x > a.r1.y && a.r0.x > a.r2.z ) {
+                float s = 2.0f * sqrtf( 1.0f + a.r0.x - a.r1.y - a.r2.z);
+                q.w = (a.r2.y - a.r1.z ) / s;
+                q.x = 0.25f * s;
+                q.y = (a.r0.y + a.r1.x ) / s;
+                q.z = (a.r0.z + a.r2.x ) / s;
+            } else if (a.r1.y > a.r2.z) {
+                float s = 2.0f * sqrtf( 1.0f + a.r1.y - a.r0.x - a.r2.z);
+                q.w = (a.r0.z - a.r2.x ) / s;
+                q.x = (a.r0.y + a.r1.x ) / s;
+                q.y = 0.25f * s;
+                q.z = (a.r1.z + a.r2.y ) / s;
+            } else {
+                float s = 2.0f * sqrtf( 1.0f + a.r2.z - a.r0.x - a.r1.y );
+                q.w = (a.r1.x - a.r0.y ) / s;
+                q.x = (a.r0.z + a.r2.x ) / s;
+                q.y = (a.r1.z + a.r2.y ) / s;
+                q.z = 0.25f * s;
+            }
+        }
+        return q;
+    }
 	INLINE Quaternion quat_conjugate(QUAT_INPUT q)
 	{
 		Quaternion ret = {
@@ -1287,6 +1346,27 @@ namespace Vec_Math {
 		ret = vec3_normalize(ret);
 		return ret;
 	}
+    INLINE Quaternion quat_between_vectors(VEC3_INPUT v1, VEC3_INPUT v2)
+    {
+        Vec3 a = vec3_normalize(v1);
+        Vec3 b = vec3_normalize(v2);
+        Vec3 xUnitVec3 = vec3_create(1, 0, 0);
+        Vec3 yUnitVec3 = vec3_create(0, 1, 0);
+        float dot = vec3_dot(a, b);
+        if (dot < -0.999999f) {
+            Vec3 tmpvec3 = vec3_cross(xUnitVec3, a);
+            if (vec3_length(tmpvec3) < 0.000001f) {
+                tmpvec3 = vec3_cross(yUnitVec3, a);
+            }
+            tmpvec3 = vec3_normalize(tmpvec3);
+            return quat_from_axis_angle(tmpvec3, kPi);
+        } else if (dot > 0.999999f) {
+            return vec4_create(0, 0, 0, 1);
+        } else {
+            Vec3 tmpvec3 = vec3_cross(a, b);
+            return quat_normalize(vec4_create(tmpvec3.x, tmpvec3.y, tmpvec3.z, 1 + dot));
+        }
+    }
 
 
 	/******************************************************************************\
