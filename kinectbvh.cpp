@@ -394,7 +394,7 @@ void KinectBVH::CreateQuaternionInformation()
         q = Vec_Math::quat_from_mat3(m);
         joints[nite::JOINT_TORSO].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
         
-        // save body's x axis for later use
+        // save body's axis x for later use
         v_body_x = vx;
         
         // JOINT_NECK
@@ -514,19 +514,11 @@ void KinectBVH::CreateQuaternionInformation()
         p2 = joints[nite::JOINT_LEFT_FOOT].pos;
         v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
         dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-        if (fabsf(dot) > MAX_STABLE_DOT) {
-            vx = last_stable_vx[nite::JOINT_LEFT_HIP];
-        } else {
-            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-            // reverse the direction because knees can only bend to back
-            vx = Vec_Math::vec3_negate(vx);
-            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
-            // bend forward
-            if (dot > 0) {
-                vx = Vec_Math::vec3_negate(vx);
-            }
-            last_stable_vx[nite::JOINT_LEFT_HIP] = vx;
-        }
+        vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        // constrain to body's axis x
+        vx = Vec_Math::vec3_add(Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(v_body_x), dot), Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(vx), 1-dot));
+        // reverse the direction because knees can only bend to back
+        vx = Vec_Math::vec3_negate(vx);
         vy = v1;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
@@ -543,19 +535,11 @@ void KinectBVH::CreateQuaternionInformation()
         p2 = joints[nite::JOINT_LEFT_FOOT].pos;
         v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
         dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-        if (fabsf(dot) > MAX_STABLE_DOT) {
-            vx = last_stable_vx[nite::JOINT_LEFT_KNEE];
-        } else {
-            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-            // reverse the direction because knees can only bend to back
-            vx = Vec_Math::vec3_negate(vx);
-            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
-            // bend forward
-            if (dot > 0) {
-                vx = Vec_Math::vec3_negate(vx);
-            }
-            last_stable_vx[nite::JOINT_LEFT_KNEE] = vx;
-        }
+        vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        // constrain to body's axis x
+        vx = Vec_Math::vec3_add(Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(v_body_x), dot), Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(vx), 1-dot));
+        // reverse the direction because knees can only bend to back
+        vx = Vec_Math::vec3_negate(vx);
         vy = v2;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
@@ -575,19 +559,11 @@ void KinectBVH::CreateQuaternionInformation()
         p2 = joints[nite::JOINT_RIGHT_FOOT].pos;
         v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
         dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-        if (fabsf(dot) > MAX_STABLE_DOT) {
-            vx = last_stable_vx[nite::JOINT_RIGHT_HIP];
-        } else {
-            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-            // reverse the direction because knees can only bend to back
-            vx = Vec_Math::vec3_negate(vx);
-            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
-            // bend forward
-            if (dot > 0) {
-                vx = Vec_Math::vec3_negate(vx);
-            }
-            last_stable_vx[nite::JOINT_RIGHT_HIP] = vx;
-        }
+        vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        // constrain to body's axis x
+        vx = Vec_Math::vec3_add(Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(v_body_x), dot), Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(vx), 1-dot));
+        // reverse the direction because knees can only bend to back
+        vx = Vec_Math::vec3_negate(vx);
         vy = v1;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
@@ -604,19 +580,11 @@ void KinectBVH::CreateQuaternionInformation()
         p2 = joints[nite::JOINT_RIGHT_FOOT].pos;
         v2 = Vec_Math::vec3_create(p2.x-p1.x, p2.y-p1.y, p2.z-p1.z);
         dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-        if (fabsf(dot) > MAX_STABLE_DOT) {
-            vx = last_stable_vx[nite::JOINT_RIGHT_KNEE];
-        } else {
-            vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
-            // reverse the direction because knees can only bend to back
-            vx = Vec_Math::vec3_negate(vx);
-            dot = Vec_Math::vec3_dot(Vec_Math::vec3_normalize(v_body_x), Vec_Math::vec3_normalize(vx));
-            // bend forward
-            if (dot > 0) {
-                vx = Vec_Math::vec3_negate(vx);
-            }
-            last_stable_vx[nite::JOINT_RIGHT_KNEE] = vx;
-        }
+        vx = Vec_Math::vec3_cross(Vec_Math::vec3_normalize(v1), Vec_Math::vec3_normalize(v2));
+        // constrain to body's axis x
+        vx = Vec_Math::vec3_add(Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(v_body_x), dot), Vec_Math::vec3_mul_scalar(Vec_Math::vec3_normalize(vx), 1-dot));
+        // reverse the direction because knees can only bend to back
+        vx = Vec_Math::vec3_negate(vx);
         vy = v2;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
