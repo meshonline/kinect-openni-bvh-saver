@@ -155,10 +155,6 @@ void CalibrateSkeleton()
 
 void ProcessBonesOrientation(const nite::Skeleton &skel)
 {
-    nite::SkeletonJoint rightHandJoint =skel.getJoint(nite::JOINT_RIGHT_HAND);
-    nite::Point3f rightHand = rightHandJoint.getPosition();
-    nite::Quaternion rightHandRotation = rightHandJoint.getOrientation();
-    
     // Position de Hip Center
     m_pKinectBVH->AddPosition(skel.getJoint(nite::JOINT_TORSO).getPosition());
     
