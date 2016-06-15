@@ -6,6 +6,20 @@
 #define __vec_math_h__
 #include <math.h>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4204) /* Nonstandard extension: non-constant aggregate initializer */
+
+/* MSVC doens't define fminf and fmaxf */
+#if _MSC_VER < 1800
+static float fminf(float a, float b) { return (a < b ? a : b); }
+static float fmaxf(float a, float b) { return (a > b ? a : b); }
+#endif
+#elif defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc99-extensions"
+#endif
+
 #ifdef __cplusplus
 namespace Vec_Math {
 #endif
@@ -734,18 +748,21 @@ namespace Vec_Math {
         Mat3 m = mat3_identity;
         // YZ plane
         if (vx.x == 0 && vx.y == 0 && vx.z == 0) {
+            // use y axis
             m.r1 = vec3_normalize(vy);
             m.r0 = vec3_normalize(vec3_cross(vy, vz));
             m.r2 = vec3_normalize(vec3_cross(m.r0, m.r1));
         }
         // XZ plane
         if (vy.x == 0 && vy.y == 0 && vy.z == 0) {
+            // use x axis
             m.r0 = vec3_normalize(vx);
             m.r1 = vec3_normalize(vec3_cross(vz, vx));
             m.r2 = vec3_normalize(vec3_cross(m.r0, m.r1));
         }
         // XY plane
         if (vz.x == 0 && vz.y == 0 && vz.z == 0) {
+            // use y axis
             m.r1 = vec3_normalize(vy);
             m.r2 = vec3_normalize(vec3_cross(vec3_normalize(vx), m.r1));
             m.r0 = vec3_normalize(vec3_cross(m.r1, m.r2));
@@ -1469,6 +1486,12 @@ namespace Vec_Math {
 
 #ifdef __cplusplus
 	} // end of namespace Vec_Math {
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#else
+#pragma GCC diagnostic pop
 #endif
 
 #endif /* include guard */
