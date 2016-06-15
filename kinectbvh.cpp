@@ -254,7 +254,7 @@ void KinectBVH::AddPosition(const nite::Point3f &position)
 
 Vec_Math::Vec3 KinectBVH::GetEulers(KinectJoint *joints, int idx)
 {
-    // get parent's quaternion, convert to right hand coordinate
+    // get parent's quaternion
     Vec_Math::Quaternion q_parent;
     if (idx == nite::JOINT_TORSO) {
         q_parent = Vec_Math::quat_identity;
@@ -265,7 +265,7 @@ Vec_Math::Vec3 KinectBVH::GetEulers(KinectJoint *joints, int idx)
                                          joints[parent_joint_map[idx]].quat.w);
     }
 
-    // get joint's quaternion, convert to right hand coordinate
+    // get joint's quaternion
     Vec_Math::Quaternion q_current = Vec_Math::vec4_create(joints[idx].quat.x,
                                                            joints[idx].quat.y,
                                                            joints[idx].quat.z,
@@ -429,6 +429,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v1;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
@@ -451,6 +452,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v2;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
@@ -476,6 +478,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v1;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
@@ -498,6 +501,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v2;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
@@ -522,6 +526,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v1;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
@@ -543,6 +548,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v2;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
@@ -567,6 +573,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v1;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
@@ -588,6 +595,7 @@ void KinectBVH::CreateQuaternionInformation()
         vy = v2;
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
+        // inverse bind pose
         mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPi));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
