@@ -74,7 +74,8 @@ void KinectBVH::FillBVHFile()
 {
     const bool use_built_in_quaternion = false;
     if (!use_built_in_quaternion) {
-        CorrectKinect();
+        FilterPositions();
+        CorrectAngle();
         CreateQuaternionInformation();
     }
 	CreateSkeletonInformation();
@@ -328,10 +329,10 @@ void KinectBVH::CreateMotionInformation()
 	m_pFile << flux.str();
 }
 
-void KinectBVH::CorrectKinect()
+void KinectBVH::CorrectAngle()
 {
     // kinect's pitch angle
-    const float kinect_angle = -6.f;
+    const float kinect_angle = -5.f;
     Vec_Math::Mat3 correct_matrix = Vec_Math::mat3_rotation_x(kinect_angle * Vec_Math::kDegToRad);
     
     Vec_Math::Vec3 one_pos;
@@ -363,6 +364,10 @@ void KinectBVH::CorrectKinect()
 
 void KinectBVH::CreateQuaternionInformation()
 {
+    // We correct special bind pose here
+    const float arm_angle = 0.0f;
+    const float arm_angle_scaler = (arm_angle + 90.0f) / 90.0f;
+    
     // we save last stable x axis for each joint to avoid trembling
     Vec_Math::Vec3 last_stable_vx[nite::JOINT_RIGHT_FOOT+1];
     for (int i=0; i<nite::JOINT_RIGHT_FOOT+1; i++) {
@@ -430,7 +435,7 @@ void KinectBVH::CreateQuaternionInformation()
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
         // inverse bind pose
-        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2));
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2*arm_angle_scaler));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
         joints[nite::JOINT_LEFT_SHOULDER].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
@@ -453,7 +458,7 @@ void KinectBVH::CreateQuaternionInformation()
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
         // inverse bind pose
-        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2));
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(Vec_Math::kPiDiv2*arm_angle_scaler));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
         joints[nite::JOINT_LEFT_ELBOW].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
@@ -479,7 +484,7 @@ void KinectBVH::CreateQuaternionInformation()
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
         // inverse bind pose
-        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2));
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2*arm_angle_scaler));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
         joints[nite::JOINT_RIGHT_SHOULDER].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
@@ -502,7 +507,7 @@ void KinectBVH::CreateQuaternionInformation()
         vz = Vec_Math::vec3_zero;
         m = Vec_Math::mat3_from_axis(vx, vy, vz);
         // inverse bind pose
-        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2));
+        mr = Vec_Math::mat3_inverse(Vec_Math::mat3_rotation_z(-Vec_Math::kPiDiv2*arm_angle_scaler));
         m = Vec_Math::mat3_multiply(mr, m);
         q = Vec_Math::quat_from_mat3(m);
         joints[nite::JOINT_RIGHT_ELBOW].quat = nite::Quaternion(q.w, q.x, q.y, q.z);
@@ -603,5 +608,74 @@ void KinectBVH::CreateQuaternionInformation()
         
         // JOINT_RIGHT_FOOT
         joints[nite::JOINT_RIGHT_FOOT].quat = joints[nite::JOINT_RIGHT_KNEE].quat;
+    }
+}
+
+void KinectBVH::FilterPositions()
+{
+    // slerp positions lack in confidence
+    int last_tracked_indices[nite::JOINT_RIGHT_FOOT+1];
+    bool last_tracked_status[nite::JOINT_RIGHT_FOOT+1];
+    // init all tracked indices to invalid value
+    for(int j = 0; j < nite::JOINT_RIGHT_FOOT+1; j++) {
+        last_tracked_indices[j] = -1;
+        last_tracked_status[j] = false;
+    }
+    
+    for (int i = 0; i < static_cast<int>(m_vPositions.size()); i++) {
+        KinectJoint *joints = &m_vBonesOrientation[i * (nite::JOINT_RIGHT_FOOT+1)];
+        for(int j = 0; j < nite::JOINT_RIGHT_FOOT+1; j++) {
+            // when lost tracking (--|__)
+            if (last_tracked_status[j] != false && joints[j].tracked == false) {
+                last_tracked_status[j] = false;
+            }
+            // when restore tracking (__|--)
+            if (last_tracked_indices[j] >= 0 && last_tracked_status[j] == false && joints[j].tracked != false) {
+                // lerp lost positions
+                int last_tracked_index = last_tracked_indices[j];
+                int current_tracked_index = i * (nite::JOINT_RIGHT_FOOT+1) + j;
+                nite::Point3f p1 = m_vBonesOrientation[last_tracked_index].pos;
+                nite::Point3f p2 = m_vBonesOrientation[current_tracked_index].pos;
+                
+                for (int k=last_tracked_index+(nite::JOINT_RIGHT_FOOT+1);
+                     k<current_tracked_index;
+                     k+=(nite::JOINT_RIGHT_FOOT+1)) {
+                    float t = (float)(k-last_tracked_index)/(current_tracked_index-last_tracked_index);
+                    m_vBonesOrientation[k].pos.x = p1.x * (1.0f - t) + p2.x * t;
+                    m_vBonesOrientation[k].pos.y = p1.y * (1.0f - t) + p2.y * t;
+                    m_vBonesOrientation[k].pos.z = p1.z * (1.0f - t) + p2.z * t;
+                }
+            }
+            // when tracked, save track index and status
+            if (joints[j].tracked != false) {
+                last_tracked_indices[j] = i * (nite::JOINT_RIGHT_FOOT+1) + j;
+                last_tracked_status[j] = joints[j].tracked;
+            }
+        }
+    }
+    
+    // apply median filter to smooth positions
+    const int filter_size = 5;
+    for (int i = filter_size/2; i < static_cast<int>(m_vPositions.size())-filter_size/2; i++) {
+        KinectJoint *joints = &m_vBonesOrientation[i * (nite::JOINT_RIGHT_FOOT+1)];
+        for(int j = 0; j < nite::JOINT_RIGHT_FOOT+1; j++) {
+            vector<float> px,py,pz;
+
+            for(int k = (i * (nite::JOINT_RIGHT_FOOT+1) + j) - (filter_size/2) * (nite::JOINT_RIGHT_FOOT+1);
+                k <= (i * (nite::JOINT_RIGHT_FOOT+1) + j) + (filter_size/2) * (nite::JOINT_RIGHT_FOOT+1);
+                k += (nite::JOINT_RIGHT_FOOT+1)) {
+                px.push_back(m_vBonesOrientation[k].pos.x);
+                py.push_back(m_vBonesOrientation[k].pos.y);
+                pz.push_back(m_vBonesOrientation[k].pos.z);
+            }
+
+            sort(px.begin(), px.end());
+            sort(py.begin(), py.end());
+            sort(pz.begin(), pz.end());
+
+            joints[j].pos.x = px[filter_size/2];
+            joints[j].pos.y = py[filter_size/2];
+            joints[j].pos.z = pz[filter_size/2];
+        }
     }
 }
