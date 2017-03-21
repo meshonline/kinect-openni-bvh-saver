@@ -19,6 +19,7 @@ struct KinectJoint
 {
     nite::Quaternion quat;
     nite::Point3f pos;
+    bool tracked;
 };
 
 /**
@@ -88,8 +89,9 @@ private:
 	* G閚鑢e les donn閑s des mouvements pour le BVH
 	*/
 	void CreateMotionInformation();
-    void CorrectKinect();
+    void CorrectAngle();
     void CreateQuaternionInformation();
+    void FilterPositions();
 };
 
 #endif // KINECTBVH_H
