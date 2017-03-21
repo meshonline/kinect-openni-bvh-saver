@@ -1384,9 +1384,29 @@ namespace Vec_Math {
             return quat_normalize(vec4_create(tmpvec3.x, tmpvec3.y, tmpvec3.z, 1 + dot));
         }
     }
-
-
-	/******************************************************************************\
+    INLINE double dot(QUAT_INPUT q1, QUAT_INPUT q2){
+        return q1.w*q2.w + q1.x*q2.x + q1.y*q2.y +q1.z*q2.z;
+    }
+    INLINE Quaternion slerp(QUAT_INPUT q1, QUAT_INPUT q2, float t){
+        float w1;
+        float w2;
+        float theta = acosf(dot(q1,q2));
+        float sinTheta = sinf(theta);
+        if (sinTheta > 0.000001f)
+        {
+            w1 = (sinf(1.f - t) * theta) / sinTheta;
+            w2 = (sinf(t) * theta) / sinTheta;
+        }
+        else
+        {
+            w1 = 1.f - t;
+            w2 = t;
+        }
+        return vec4_create(q1.x*w1+q2.x*w2, q1.y*w1+q2.y*w2, q1.z*w1+q2.z*w2, q1.w*w1+q2.w*w2);
+    }
+        
+        
+        /******************************************************************************\
 	* Transform                                                                   *
 	\******************************************************************************/
 	static const Transform transform_zero = {
