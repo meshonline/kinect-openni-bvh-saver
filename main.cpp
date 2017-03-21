@@ -170,6 +170,8 @@ void ProcessBonesOrientation(const nite::Skeleton &skel)
         joints[i].pos = skel.getJoint((nite::JointType)i).getPosition();
         // convert to right hand coordinate
         joints[i].pos.z = -joints[i].pos.z;
+        
+        joints[i].tracked = skel.getJoint((nite::JointType)i).getPositionConfidence() > 0.5f;
     }
     
     m_pKinectBVH->AddBonesOrientation(joints);
@@ -216,7 +218,7 @@ int main( int argc, char **argv )
     // n3. create user tracker
     UserTracker mUserTracker;
     mUserTracker.create( &mDevice );
-    mUserTracker.setSkeletonSmoothingFactor( 0.1f );
+    mUserTracker.setSkeletonSmoothingFactor( 0.0f );
     
     // create OpenCV Window
     cv::namedWindow( "User Image",  CV_WINDOW_AUTOSIZE );
