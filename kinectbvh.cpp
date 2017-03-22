@@ -625,6 +625,7 @@ void KinectBVH::FilterPositions()
     for (int i = 0; i < static_cast<int>(m_vPositions.size()); i++) {
         KinectJoint *joints = &m_vBonesOrientation[i * (nite::JOINT_RIGHT_FOOT+1)];
         for(int j = 0; j < nite::JOINT_RIGHT_FOOT+1; j++) {
+            int index = i * (nite::JOINT_RIGHT_FOOT+1) + j;
             // when lost tracking (--|__)
             if (last_tracked_status[j] != false && joints[j].tracked == false) {
                 last_tracked_status[j] = false;
@@ -633,7 +634,7 @@ void KinectBVH::FilterPositions()
             if (last_tracked_indices[j] >= 0 && last_tracked_status[j] == false && joints[j].tracked != false) {
                 // lerp lost positions
                 int last_tracked_index = last_tracked_indices[j];
-                int current_tracked_index = i * (nite::JOINT_RIGHT_FOOT+1) + j;
+                int current_tracked_index = index;
                 nite::Point3f p1 = m_vBonesOrientation[last_tracked_index].pos;
                 nite::Point3f p2 = m_vBonesOrientation[current_tracked_index].pos;
                 
@@ -648,34 +649,59 @@ void KinectBVH::FilterPositions()
             }
             // when tracked, save track index and status
             if (joints[j].tracked != false) {
-                last_tracked_indices[j] = i * (nite::JOINT_RIGHT_FOOT+1) + j;
+                last_tracked_indices[j] = index;
                 last_tracked_status[j] = joints[j].tracked;
             }
         }
     }
     
-    // apply median filter to smooth positions
-    const int filter_size = 5;
-    for (int i = filter_size/2; i < static_cast<int>(m_vPositions.size())-filter_size/2; i++) {
+    // calculate median filter
+    const int filter_radius = 2;
+    int min_k = 0;
+    int max_k = static_cast<int>(m_vPositions.size() - 1) * (nite::JOINT_RIGHT_FOOT+1);
+    vector<float> temp_positions;
+    for (int i = 0; i < static_cast<int>(m_vPositions.size()); i++) {
         KinectJoint *joints = &m_vBonesOrientation[i * (nite::JOINT_RIGHT_FOOT+1)];
         for(int j = 0; j < nite::JOINT_RIGHT_FOOT+1; j++) {
             vector<float> px,py,pz;
 
-            for(int k = (i * (nite::JOINT_RIGHT_FOOT+1) + j) - (filter_size/2) * (nite::JOINT_RIGHT_FOOT+1);
-                k <= (i * (nite::JOINT_RIGHT_FOOT+1) + j) + (filter_size/2) * (nite::JOINT_RIGHT_FOOT+1);
+            int index = i * (nite::JOINT_RIGHT_FOOT+1) + j;
+            for(int k = index - filter_radius * (nite::JOINT_RIGHT_FOOT+1);
+                k <= index + filter_radius * (nite::JOINT_RIGHT_FOOT+1);
                 k += (nite::JOINT_RIGHT_FOOT+1)) {
-                px.push_back(m_vBonesOrientation[k].pos.x);
-                py.push_back(m_vBonesOrientation[k].pos.y);
-                pz.push_back(m_vBonesOrientation[k].pos.z);
+                if (k-j < min_k) {
+                    px.push_back(m_vBonesOrientation[min_k+j].pos.x);
+                    py.push_back(m_vBonesOrientation[min_k+j].pos.y);
+                    pz.push_back(m_vBonesOrientation[min_k+j].pos.z);
+                } else if (k-j > max_k) {
+                    px.push_back(m_vBonesOrientation[max_k+j].pos.x);
+                    py.push_back(m_vBonesOrientation[max_k+j].pos.y);
+                    pz.push_back(m_vBonesOrientation[max_k+j].pos.z);
+                } else {
+                    px.push_back(m_vBonesOrientation[k].pos.x);
+                    py.push_back(m_vBonesOrientation[k].pos.y);
+                    pz.push_back(m_vBonesOrientation[k].pos.z);
+                }
             }
 
             sort(px.begin(), px.end());
             sort(py.begin(), py.end());
             sort(pz.begin(), pz.end());
 
-            joints[j].pos.x = px[filter_size/2];
-            joints[j].pos.y = py[filter_size/2];
-            joints[j].pos.z = pz[filter_size/2];
+            temp_positions.push_back(px[filter_radius]);
+            temp_positions.push_back(py[filter_radius]);
+            temp_positions.push_back(pz[filter_radius]);
+        }
+    }
+    // apply median filter
+    for (int i = 0; i < static_cast<int>(m_vPositions.size()); i++) {
+        KinectJoint *joints = &m_vBonesOrientation[i * (nite::JOINT_RIGHT_FOOT+1)];
+        for(int j = 0; j < nite::JOINT_RIGHT_FOOT+1; j++) {
+            int index = i * (nite::JOINT_RIGHT_FOOT+1) + j;
+            float *positions = &temp_positions[index * 3];
+            joints[j].pos.x = positions[0];
+            joints[j].pos.y = positions[1];
+            joints[j].pos.z = positions[2];
         }
     }
 }
