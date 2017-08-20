@@ -51,7 +51,11 @@ void StopRecording()
 {
     if (m_bRecording) {
         m_bRecording = false;
-        m_pKinectBVH->FillBVHFile();
+        time_t nowtime = time(NULL);
+        struct tm *local = localtime(&nowtime);
+        char buf[256];
+        sprintf(buf, "%d-%d-%d-%d-%d-%d.bvh", local->tm_year+1900, local->tm_mon+1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
+        m_pKinectBVH->SaveToBVHFile(buf);
         delete m_pKinectBVH;
         m_pKinectBVH = NULL;
         m_bIsCalibrated = false;
@@ -60,123 +64,28 @@ void StopRecording()
 
 void CalibrateSkeleton()
 {
-    nite::Point3f offsets[nite::JOINT_RIGHT_FOOT+1];
-    
-    nite::Point3f offset;
-    
-    offset.x = 0;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_TORSO] = offset;
-    
-    offset.x = 0;
-    offset.y = 43.63f;
-    offset.z = 0;
-    offsets[nite::JOINT_NECK] = offset;
-    
-    offset.x = 0;
-    offset.y = 18.49f;
-    offset.z = 0;
-    offsets[nite::JOINT_HEAD] = offset;
-    
-    offset.x = -14.f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_LEFT_SHOULDER] = offset;
-    
-    offset.x = -25.f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_LEFT_ELBOW] = offset;
-    
-    offset.x = -23.f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_LEFT_HAND] = offset;
-    
-    offset.x = 14.f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_RIGHT_SHOULDER] = offset;
-    
-    offset.x = 25.f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_RIGHT_ELBOW] = offset;
-    
-    offset.x = 23.f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_RIGHT_HAND] = offset;
-    
-    offset.x = -9.52f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_LEFT_HIP] = offset;
-    
-    offset.x = 0;
-    offset.y = -37.32f;
-    offset.z = 0;
-    offsets[nite::JOINT_LEFT_KNEE] = offset;
-    
-    offset.x = 0;
-    offset.y = -34.6f;
-    offset.z = 0;
-    offsets[nite::JOINT_LEFT_FOOT] = offset;
-    
-    offset.x = 9.52f;
-    offset.y = 0;
-    offset.z = 0;
-    offsets[nite::JOINT_RIGHT_HIP] = offset;
-    
-    offset.x = 0;
-    offset.y = -37.32f;
-    offset.z = 0;
-    offsets[nite::JOINT_RIGHT_KNEE] = offset;
-    
-    offset.x = 0;
-    offset.y = -34.6f;
-    offset.z = 0;
-    offsets[nite::JOINT_RIGHT_FOOT] = offset;
-    
-    time_t nowtime = time(NULL);
-    struct tm *local = localtime(&nowtime);
-    
-    char buf[256];
-    sprintf(buf, "%d-%d-%d-%d-%d-%d.bvh", local->tm_year+1900, local->tm_mon+1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
-    if (m_pKinectBVH->CreateBVHFile(buf))
-    {
-        for (int i = 0; i < (nite::JOINT_RIGHT_FOOT+1); i++) {
-            m_pKinectBVH->AddOffset(i, offsets[i]);
-        }
-        m_bIsCalibrated = true;
-    }
+    m_pKinectBVH->CalibrateSkeleton();
+    m_bIsCalibrated = true;
 }
 
 void ProcessBonesOrientation(const nite::Skeleton &skel)
 {
-    // Position de Hip Center
-    m_pKinectBVH->AddPosition(skel.getJoint(nite::JOINT_TORSO).getPosition());
-    
-    KinectJoint joints[nite::JOINT_RIGHT_FOOT+1];
-    // Matrice de rotations des joints
-    for (int i = 0; i < (nite::JOINT_RIGHT_FOOT+1); i++)
+    vector<Joint> joints(JOINT_SIZE);
+    // Fill joints
+    for (int i = 0; i < JOINT_SIZE; i++)
     {
-        joints[i].quat = skel.getJoint((nite::JointType)i).getOrientation();
+        nite::Point3f pos = skel.getJoint((nite::JointType)i).getPosition();
+        joints[i].pos.x = pos.x;
+        joints[i].pos.y = pos.y;
         // convert to right hand coordinate
-        joints[i].quat.x = -joints[i].quat.x;
-        joints[i].quat.y = -joints[i].quat.y;
-
-        joints[i].pos = skel.getJoint((nite::JointType)i).getPosition();
-        // convert to right hand coordinate
-        joints[i].pos.z = -joints[i].pos.z;
-        
+        joints[i].pos.z = -pos.z;
         joints[i].tracked = skel.getJoint((nite::JointType)i).getPositionConfidence() > 0.5f;
     }
     
-    m_pKinectBVH->AddBonesOrientation(joints);
+    // Add the positions of all joints.
+    m_pKinectBVH->AddAllJointsPosition(&joints[0]);
     
-    // Incr閙entation du nombre de frames
+    // Increase the frame number.
     m_pKinectBVH->IncrementNbFrames();
 }
 
@@ -288,21 +197,21 @@ int main( int argc, char **argv )
                     
                     // p4c. build joints array
                     SkeletonJoint aJoints[15];
-                    aJoints[ 0] = rSkeleton.getJoint( JOINT_HEAD );
-                    aJoints[ 1] = rSkeleton.getJoint( JOINT_NECK );
-                    aJoints[ 2] = rSkeleton.getJoint( JOINT_LEFT_SHOULDER );
-                    aJoints[ 3] = rSkeleton.getJoint( JOINT_RIGHT_SHOULDER );
-                    aJoints[ 4] = rSkeleton.getJoint( JOINT_LEFT_ELBOW );
-                    aJoints[ 5] = rSkeleton.getJoint( JOINT_RIGHT_ELBOW );
-                    aJoints[ 6] = rSkeleton.getJoint( JOINT_LEFT_HAND );
-                    aJoints[ 7] = rSkeleton.getJoint( JOINT_RIGHT_HAND );
-                    aJoints[ 8] = rSkeleton.getJoint( JOINT_TORSO );
-                    aJoints[ 9] = rSkeleton.getJoint( JOINT_LEFT_HIP );
-                    aJoints[10] = rSkeleton.getJoint( JOINT_RIGHT_HIP );
-                    aJoints[11] = rSkeleton.getJoint( JOINT_LEFT_KNEE );
-                    aJoints[12] = rSkeleton.getJoint( JOINT_RIGHT_KNEE );
-                    aJoints[13] = rSkeleton.getJoint( JOINT_LEFT_FOOT );
-                    aJoints[14] = rSkeleton.getJoint( JOINT_RIGHT_FOOT );
+                    aJoints[ 0] = rSkeleton.getJoint( nite::JOINT_HEAD );
+                    aJoints[ 1] = rSkeleton.getJoint( nite::JOINT_NECK );
+                    aJoints[ 2] = rSkeleton.getJoint( nite::JOINT_LEFT_SHOULDER );
+                    aJoints[ 3] = rSkeleton.getJoint( nite::JOINT_RIGHT_SHOULDER );
+                    aJoints[ 4] = rSkeleton.getJoint( nite::JOINT_LEFT_ELBOW );
+                    aJoints[ 5] = rSkeleton.getJoint( nite::JOINT_RIGHT_ELBOW );
+                    aJoints[ 6] = rSkeleton.getJoint( nite::JOINT_LEFT_HAND );
+                    aJoints[ 7] = rSkeleton.getJoint( nite::JOINT_RIGHT_HAND );
+                    aJoints[ 8] = rSkeleton.getJoint( nite::JOINT_TORSO );
+                    aJoints[ 9] = rSkeleton.getJoint( nite::JOINT_LEFT_HIP );
+                    aJoints[10] = rSkeleton.getJoint( nite::JOINT_RIGHT_HIP );
+                    aJoints[11] = rSkeleton.getJoint( nite::JOINT_LEFT_KNEE );
+                    aJoints[12] = rSkeleton.getJoint( nite::JOINT_RIGHT_KNEE );
+                    aJoints[13] = rSkeleton.getJoint( nite::JOINT_LEFT_FOOT );
+                    aJoints[14] = rSkeleton.getJoint( nite::JOINT_RIGHT_FOOT );
                     
                     // p4d. convert joint position to image
                     cv::Point2f aPoint[15];
