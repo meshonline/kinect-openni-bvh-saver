@@ -6,8 +6,12 @@ Then you can import the bvh files into Blender or other softwares to smooth anim
 <br/>
 You can turn your body around 360 degrees in this project, I am very satisfied with the result.<br/>
 <br/>
-Though the project is developed on macOS, you can port it to Linux, Windows easily, for the source code is portable.
+Though the project is developed on macOS, you can port it to Linux, Windows easily, for the source code is portable.<br/>
+<br/>
+Click the image to watch kinect mocap demo:<br/>
+<br/>
 [![Kinect Mocap Demo](video-cover.png)](https://youtu.be/4x8NyXuXZWI "Kinect Mocap Demo")
+<br/>
 ### Requirements
 macOS 10.11<br/>
 kinect for xbox 360<br/>
