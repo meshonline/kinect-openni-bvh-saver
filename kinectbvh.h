@@ -1,7 +1,13 @@
 #ifndef KINECTBVH_H
 #define KINECTBVH_H
 
-#define SCALE 1.0f
+// Kinect tilt angle, you need to adjust this value in your case.
+#define TILT_ANGLE 12.5f
+
+// BVH use centimeter by default, we scale to meter to match the default unit of Blender.
+#define SCALE 0.01f
+
+// 30 FPS
 #define FPS 0.033333
 
 #include <iostream>
@@ -181,7 +187,7 @@ public:
         m_pFile.open(filename.c_str());
         if (m_pFile.is_open()) {
             FilterPositions();
-            CorrectAngle(12.5f);
+            CorrectAngle(TILT_ANGLE);
             CreateQuaternionInformation();
             CreateSkeletonInformation();
             CreateMotionInformation();
@@ -273,7 +279,7 @@ private:
         flux << "\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
         flux << "\t\t\tEnd Site" << endl;
         flux << "\t\t\t{" << endl;
-        flux << "\t\t\t\tOFFSET 0.0 " << 8.91 << " 0.0" << endl;
+        flux << "\t\t\t\tOFFSET 0.0 " << 8.91f * SCALE << " 0.0" << endl;
         flux << "\t\t\t}" << endl;
         flux << "\t\t}" << endl;
         
@@ -301,7 +307,7 @@ private:
         flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
         flux << "\t\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t\t{" << endl;
-        flux << "\t\t\t\t\t\tOFFSET -8.32 0.0 0.0" << endl;
+        flux << "\t\t\t\t\t\tOFFSET " << -8.32f * SCALE << " 0.0 0.0" << endl;
         flux << "\t\t\t\t\t}" << endl;
         flux << "\t\t\t\t}" << endl;
         flux << "\t\t\t}" << endl;
@@ -331,7 +337,7 @@ private:
         flux << "\t\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
         flux << "\t\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t\t{" << endl;
-        flux << "\t\t\t\t\t\tOFFSET 8.32 0.0 0.0" << endl;
+        flux << "\t\t\t\t\t\tOFFSET " << 8.32f * SCALE << " 0.0 0.0" << endl;
         flux << "\t\t\t\t\t}" << endl;
         flux << "\t\t\t\t}" << endl;
         flux << "\t\t\t}" << endl;
@@ -366,7 +372,7 @@ private:
         flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
         flux << "\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t{" << endl;
-        flux << "\t\t\t\t\tOFFSET 0.0 0.0 8.91" << endl;
+        flux << "\t\t\t\t\tOFFSET 0.0 0.0 " << 8.91f * SCALE << endl;
         flux << "\t\t\t\t}" << endl;
         flux << "\t\t\t}" << endl;
         flux << "\t\t}" << endl;
@@ -399,7 +405,7 @@ private:
         flux << "\t\t\t\tCHANNELS 3 Zrotation Yrotation Xrotation" << endl;
         flux << "\t\t\t\tEnd Site" << endl;
         flux << "\t\t\t\t{" << endl;
-        flux << "\t\t\t\t\tOFFSET 0.0 0.0 8.91" << endl;
+        flux << "\t\t\t\t\tOFFSET 0.0 0.0 " << 8.91f * SCALE << endl;
         flux << "\t\t\t\t}" << endl;
         flux << "\t\t\t}" << endl;
         flux << "\t\t}" << endl;
