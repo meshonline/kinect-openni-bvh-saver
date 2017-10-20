@@ -1,0 +1,61 @@
+//
+//  main.cpp
+//  tiltkinect
+//
+//  Created by MINGFENWANG on 2017/6/15.
+//  Copyright © 2017年 MINGFENWANG. All rights reserved.
+//
+
+//#include "libfreenect.h"
+#include "libfreenect.h"
+#include <iostream>
+
+int main(int argc, const char * argv[]) {
+    // insert code here...
+    std::cout << "Please enter the tilt angle: ";
+
+    int tilt;
+    std::cin >> tilt;
+
+    std::cout << "Working..." << std::endl;
+
+    // Initialize libfreenect.
+    freenect_context* fn_ctx;
+    int ret = freenect_init(&fn_ctx, NULL);
+    if (ret < 0)
+        return ret;
+    
+    // Use motor only.
+    freenect_select_subdevices(fn_ctx, FREENECT_DEVICE_MOTOR);
+    
+    // Find out how many devices are connected.
+    int num_devices = ret = freenect_num_devices(fn_ctx);
+    if (ret < 0)
+        return ret;
+    if (num_devices == 0)
+    {
+        printf("No device found!\n");
+        freenect_shutdown(fn_ctx);
+        return 1;
+    }
+    
+    // Open the first device.
+    freenect_device* fn_dev;
+    ret = freenect_open_device(fn_ctx, &fn_dev, 0);
+    if (ret < 0)
+    {
+        freenect_shutdown(fn_ctx);
+        return ret;
+    }
+    
+    // Set the tilt angle
+    freenect_set_tilt_degs(fn_dev, tilt);
+    // Set the led light to green status
+    freenect_set_led(fn_dev, LED_GREEN);
+    
+    freenect_close_device(fn_dev);
+    freenect_shutdown(fn_ctx);
+
+    std::cout << "Done." << std::endl;
+    return 0;
+}
