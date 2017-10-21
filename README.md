@@ -13,7 +13,8 @@ Port hint:<br/>
 2.Git clone [https://github.com/OpenKinect/libfreenect](https://github.com/OpenKinect/libfreenect), build the kinect driver for your platform.<br/>
 3.Copy the generated kinect driver(OpenNI2-FreenectDriver/libFreenectDriver.0.5.x) to OpenNI 2 SDK's "Redist/OpenNI2/Drivers".<br/>
 4.Download [NiTE2 SDK](http://pan.baidu.com/s/1gd9XdIV) or [NiTE2 SDK](https://pan.baidu.com/share/link?shareid=1109357935&uk=757472483#list/path=%2F), install the SDK.<br/>
-5.Build the source code.<br/>
+5.Download [opencv 2.4.13](https://opencv.org/releases.html), install the SDK.<br/>
+6.Build the source code.<br/>
 <br/>
 Click the image to watch kinect mocap demo:<br/>
 [![Kinect Mocap Demo](video-cover.png)](https://youtu.be/4x8NyXuXZWI "Kinect Mocap Demo")
