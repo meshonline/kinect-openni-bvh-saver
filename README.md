@@ -11,8 +11,8 @@ Though the project is developed on macOS, you can port it to Linux, Windows easi
 Port hint:<br/>
 1.Download OpenNI 2 SDK Binaries from [https://structure.io/openni](https://structure.io/openni), install the SDK.<br/>
 2.Git clone [https://github.com/OpenKinect/libfreenect](https://github.com/OpenKinect/libfreenect), build the kinect driver for your platform.<br/>
-3.Copy the kinect driver to OpenNI 2 SDK's "Redist/OpenNI2/Drivers".<br/>
-4.Download [NiTE2 SDK](http://pan.baidu.com/s/1gd9XdIV) or [NiTE2 SDK](https://pan.baidu.com/share/link?shareid=1109357935&uk=757472483#list/path=%2F)and install.<br/>
+3.Copy the generated kinect driver(OpenNI2-FreenectDriver/libFreenectDriver.0.5.x) to OpenNI 2 SDK's "Redist/OpenNI2/Drivers".<br/>
+4.Download [NiTE2 SDK](http://pan.baidu.com/s/1gd9XdIV) or [NiTE2 SDK](https://pan.baidu.com/share/link?shareid=1109357935&uk=757472483#list/path=%2F), install the SDK.<br/>
 5.Build the source code.<br/>
 <br/>
 Click the image to watch kinect mocap demo:<br/>
