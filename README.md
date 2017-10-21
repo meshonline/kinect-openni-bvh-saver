@@ -9,10 +9,11 @@ You can turn your body around 360 degrees in this project, I am very satisfied w
 Though the project is developed on macOS, you can port it to Linux, Windows easily, for the source code is portable.<br/>
 <br/>
 Port hint:<br/>
-1.Git clone [https://github.com/OpenKinect/libfreenect](https://github.com/OpenKinect/libfreenect), build the kinect driver for your platform.<br/>
-2.Download OpenNI 2 SDK Binaries from [https://structure.io/openni](https://structure.io/openni), install the SDK.<br/>
+1.Download OpenNI 2 SDK Binaries from [https://structure.io/openni](https://structure.io/openni), install the SDK.<br/>
+2.Git clone [https://github.com/OpenKinect/libfreenect](https://github.com/OpenKinect/libfreenect), build the kinect driver for your platform.<br/>
 3.Copy the kinect driver to OpenNI 2 SDK's "Redist/OpenNI2/Drivers".<br/>
-4.Build the source code.<br/>
+4.Download [NiTE2 SDK](http://pan.baidu.com/s/1gd9XdIV) and install.
+5.Build the source code.<br/>
 <br/>
 Click the image to watch kinect mocap demo:<br/>
 [![Kinect Mocap Demo](video-cover.png)](https://youtu.be/4x8NyXuXZWI "Kinect Mocap Demo")
