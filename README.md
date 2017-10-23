@@ -8,6 +8,9 @@ You can turn your body around 360 degrees in this project, I am very satisfied w
 <br/>
 Though the project is developed on macOS, you can port it to Linux, Windows easily, for the source code is portable.<br/>
 <br/>
+
+Windows release: [drive.google.com](https://drive.google.com/file/d/0B37dehusTo2MTWJEdkdrd29pLWM/view?usp=sharing)<br/>
+<br/>
 Linux port hint:<br/>
 [Ubuntu Kinect C++ Development Enviroment](https://github.com/suiwenfeng/Ubuntu_x64_Openni2.2_NiTE2.2_FreenectDriver).<br/>
 <br/>
