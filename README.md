@@ -8,13 +8,14 @@ You can turn your body around 360 degrees in this project, I am very satisfied w
 <br/>
 Though the project is developed on macOS, you can port it to Linux, Windows easily, for the source code is portable.<br/>
 <br/>
-Port hint:<br/>
+Linux port hint:<br/>
+[Ubuntu Kinect C++ Development Enviroment](https://github.com/suiwenfeng/Ubuntu_x64_Openni2.2_NiTE2.2_FreenectDriver).<br/>
+<br/>
+Windows port hint:<br/>
 1.Download OpenNI 2 SDK Binaries from [https://structure.io/openni](https://structure.io/openni), install the SDK.<br/>
-2.Git clone [https://github.com/OpenKinect/libfreenect](https://github.com/OpenKinect/libfreenect), build the kinect driver for your platform.<br/>
-3.Copy the generated kinect driver(OpenNI2-FreenectDriver/libFreenectDriver.0.5.x) to OpenNI 2 SDK's "Redist/OpenNI2/Drivers".<br/>
-4.Download [NiTE2 SDK](http://pan.baidu.com/s/1gd9XdIV) or [NiTE2 SDK](https://pan.baidu.com/share/link?shareid=1109357935&uk=757472483#list/path=%2F), install the SDK.<br/>
-5.Download [opencv 2.4.13](https://opencv.org/releases.html), install the SDK.<br/>
-6.Build the source code.<br/>
+2.Download [NiTE-Windows-x64-2.2.zip](https://drive.google.com/file/d/0B3e4_6C5_YOjOGIySEluYkNibEE/edit) or [NiTE-Windows-x86-2.2.zip](https://drive.google.com/file/d/0B3e4_6C5_YOjQWtCcVl3VnRsWG8/edit), install the SDK.<br/>
+3.Download [opencv 2.4.13](https://opencv.org/releases.html), install the SDK.<br/>
+4.Build the source code.<br/>
 <br/>
 Click the image to watch kinect mocap demo:<br/>
 [![Kinect Mocap Demo](video-cover.png)](https://youtu.be/4x8NyXuXZWI "Kinect Mocap Demo")
