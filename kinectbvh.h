@@ -1,9 +1,6 @@
 #ifndef KINECTBVH_H
 #define KINECTBVH_H
 
-// Kinect tilt angle, you need to adjust this value in your case.
-#define TILT_ANGLE 12.5f
-
 // BVH use centimeter by default, we scale to meter to match the default unit of Blender.
 #define SCALE 0.01f
 
@@ -187,7 +184,7 @@ public:
         m_pFile.open(filename.c_str());
         if (m_pFile.is_open()) {
             FilterPositions();
-            CorrectAngle(TILT_ANGLE);
+            CorrectAngle(tilt_angle);
             CreateQuaternionInformation();
             CreateSkeletonInformation();
             CreateMotionInformation();
@@ -195,7 +192,13 @@ public:
         }
     }
     
+    // Set kinect tilt angle
+    void SetTiltAngle(const float& angle) {
+        tilt_angle = angle;
+    }
+    
 private:
+    float tilt_angle;
     // Frame counter.
     int m_nbFrame;
     // The relative offset to it parent.
@@ -456,7 +459,7 @@ private:
     // Correct the pitch angle of the camera.
     void CorrectAngle(const float& kinect_angle) {
         // Calculate the invert rotation matrix.
-        Mat3 correct_matrix = mat3_rotation_x(-kinect_angle * kDegToRad);
+        Mat3 correct_matrix = mat3_rotation_x(kinect_angle * kDegToRad);
         
         // Rotate the position for every joint.
         for (int i = 0; i < static_cast<int>(m_vJointsOrientation.size()); i++) {
