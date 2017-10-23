@@ -54,7 +54,7 @@ void StopRecording()
         time_t nowtime = time(NULL);
         struct tm *local = localtime(&nowtime);
         char buf[256];
-        sprintf(buf, "%d-%d-%d-%d-%d-%d.bvh", local->tm_year+1900, local->tm_mon+1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
+        sprintf(buf, "../data/%d-%d-%d-%d-%d-%d.bvh", local->tm_year+1900, local->tm_mon+1, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec);
         m_pKinectBVH->SaveToBVHFile(buf);
         delete m_pKinectBVH;
         m_pKinectBVH = NULL;
@@ -91,6 +91,14 @@ void ProcessBonesOrientation(const nite::Skeleton &skel)
 
 int main( int argc, char **argv )
 {
+    // read tilt angle from file
+    float tile_angle = 0.0f;
+    ifstream rf("tilt-angle.txt");
+    if (rf.is_open()) {
+        rf >> tile_angle;
+    }
+    rf.close();
+
     // o2. Initial OpenNI
     OpenNI::initialize();
     
@@ -180,6 +188,8 @@ int main( int argc, char **argv )
                     {
                         printf("start recording\n");
                         StartRecording();
+                        // set tile angle
+                        m_pKinectBVH->SetTiltAngle(tile_angle);
                     }
                     
                     // calibrate T pose
@@ -260,7 +270,7 @@ int main( int argc, char **argv )
         // p5. show image
         cv::imshow( "User Image", cImageBGR );
         // p6. check keyboard
-        if( cv::waitKey( 1 ) == 'q' )
+        if( cv::waitKey( 1 ) == 27 )
             break;
     }
     
