@@ -9,12 +9,13 @@
 //#include "libfreenect.h"
 #include "libfreenect.h"
 #include <iostream>
+#include <fstream>
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Please enter the tilt angle: ";
 
-    int tilt;
+    float tilt;
     std::cin >> tilt;
 
     std::cout << "Working..." << std::endl;
@@ -55,6 +56,10 @@ int main(int argc, const char * argv[]) {
     
     freenect_close_device(fn_dev);
     freenect_shutdown(fn_ctx);
+    
+    std::ofstream wf("tilt-angle.txt");
+    wf << tilt << std::endl;
+    wf.close();
 
     std::cout << "Done." << std::endl;
     return 0;
