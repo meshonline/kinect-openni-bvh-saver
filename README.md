@@ -9,7 +9,7 @@ You can turn your body around 360 degrees in this project, I am very satisfied w
 Though the project is developed on macOS, you can port it to Linux, Windows easily, for the source code is portable.<br/>
 <br/>
 
-Download windows release from: [drive.google.com](https://drive.google.com/file/d/0B37dehusTo2MTWJEdkdrd29pLWM/view?usp=sharing)<br/>
+Download windows release from: [https://drive.google.com/file/d/0B37dehusTo2MTWJEdkdrd29pLWM/view?usp=sharing](https://drive.google.com/file/d/0B37dehusTo2MTWJEdkdrd29pLWM/view?usp=sharing)<br/>
 <br/>
 Linux port hint:<br/>
 [Ubuntu Kinect C++ Development Enviroment](https://github.com/suiwenfeng/Ubuntu_x64_Openni2.2_NiTE2.2_FreenectDriver).<br/>
@@ -33,17 +33,17 @@ OpenCV2<br/>
 Xcode 7.3.1
 ### How to use
 1.Git clone [openni-nite-opencv-xcode](https://github.com/rishadbharucha/openni-nite-opencv-xcode).<br/>
-2.Install OpenNI2, OpenCV2 from source code or via macport or homebrew, you may need to install latest libpng from source code as well.<br/>
+2.Install libpng, OpenNI2, OpenCV2 from source code, via macport or homebrew.<br/>
 3.Copy all the source codes to 'openni-nite-opencv-xcode/OpenNI+NITE+OpenCV', and add them to the project.<br/>
 4.Copy /usr/local/lib/OpenNI2-FreenectDriver/libFreenectDriver.0.5.0.dylib to 'openni-nite-opencv-xcode/OpenNI2/Drivers/libFreenectDriver.dylib', then add the filename to Xcode's 'Targets->Build Phases->Copy Files(5 items)', ensure that the Subpath is 'OpenNI2/Drivers'.<br/>
-5.Plug in kinect for xbox 360.<br/>
+5.Plug kinect for xbox 360 into USB port.<br/>
 6.Open the project, build and run.<br/>
 <br/>
-Note: If you failed to run, just try again, for the Kinect driver for macOS is not stable.<br/>
+Note: If you failed to run, just try again, the Kinect driver for macOS is not stable.<br/>
 <br/>
-When the Kinect camera detects your body, the software will automatically record the skeleton animation to a bvh file, after the Kinect camera can not detect your body, the software will finish recording the bvh file, the output path is the current directory.<br/>
+When the Kinect sensor detects your body, the app will start recording, after the Kinect sensor lose your body, the app will stop recording, the BVH files will be saved to '../data'.<br/>
 <br/>
-Enter the Kinect camera's viewport, perform actions, then leave the viewport, repeat the steps, you can record many skeleton animation clips at one time.
+Enter the Kinect camera's viewport, perform actions, then leave the viewport. Repeat the above steps, you can record many skeleton animation clips at one time.
 ### Thanks
 1.[Derek Hendrickx's KinectMotionCapture](https://github.com/derekhendrickx/KinectMotionCapture)<br/>
 2.[Kyle Weicht's 3D math library](https://github.com/awesomekyle/math)<br/>
