@@ -20,7 +20,7 @@ Windows port hint:<br/>
 1.Download [Kinect for Windows SDK 1.8](https://www.microsoft.com/en-us/download/details.aspx?id=40278), install the SDK.<br/>
 2.Download [OpenNI 2 SDK Binaries](https://s3.amazonaws.com/com.occipital.openni/OpenNI-Windows-x86-2.2.0.33.zip), install the SDK.<br/>
 3.Download [NiTE-Windows-x86-2.2.zip](https://drive.google.com/file/d/0B3e4_6C5_YOjQWtCcVl3VnRsWG8/edit), install the SDK.<br/>
-4.Download [opencv 2.4.11 Win Pack](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/2.4.11/opencv-2.4.11.exe/download), install the SDK to C:\.<br/>
+4.Download [opencv 2.4.11 Win Pack](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/2.4.11/opencv-2.4.11.exe/download), install the SDK to the root of drive C:.<br/>
 5.Build the source code with Visual Studio 2010 or Visual Studio Community 2017.<br/>
 <br/>
 Click the image to watch kinect mocap demo:<br/>
