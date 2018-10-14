@@ -11,19 +11,17 @@ You can turn your body around 360 degrees in this project, I am very satisfied w
 Though the project is developed on macOS, you can port it to Linux, Windows easily, for the source code is portable.<br/>
 <br/>
 
-Download windows release from: [https://drive.google.com/file/d/0B37dehusTo2MTWJEdkdrd29pLWM/view?usp=sharing](https://drive.google.com/file/d/0B37dehusTo2MTWJEdkdrd29pLWM/view?usp=sharing)<br/>
-Or<br/>
 Download windows release from: [http://www.mesh-online.net/mocap-windows.zip](http://www.mesh-online.net/mocap-windows.zip)<br/>
 <br/>
 Linux port hint:<br/>
 [Ubuntu Kinect C++ Development Enviroment](https://github.com/suiwenfeng/Ubuntu_x64_Openni2.2_NiTE2.2_FreenectDriver).<br/>
 <br/>
 Windows port hint:<br/>
-1.Download [Kinect for Windows SDK 1.8](https://msdn.microsoft.com/en-us/library/hh855347.aspx), install the SDK.<br/>
-2.Download OpenNI 2 SDK Binaries from [https://structure.io/openni](https://structure.io/openni), install the SDK.<br/>
-3.Download [NiTE-Windows-x64-2.2.zip](https://drive.google.com/file/d/0B3e4_6C5_YOjOGIySEluYkNibEE/edit) or [NiTE-Windows-x86-2.2.zip](https://drive.google.com/file/d/0B3e4_6C5_YOjQWtCcVl3VnRsWG8/edit), install the SDK.<br/>
-4.Download [opencv 2.4.11](https://opencv.org/releases.html), install the SDK.<br/>
-5.Build the source code with VS2010.<br/>
+1.Download [Kinect for Windows SDK 1.8](https://www.microsoft.com/en-us/download/details.aspx?id=40278), install the SDK.<br/>
+2.Download [OpenNI 2 SDK Binaries](https://s3.amazonaws.com/com.occipital.openni/OpenNI-Windows-x86-2.2.0.33.zip), install the SDK.<br/>
+3.Download [NiTE-Windows-x86-2.2.zip](https://drive.google.com/file/d/0B3e4_6C5_YOjQWtCcVl3VnRsWG8/edit), install the SDK.<br/>
+4.Download [opencv 2.4.11 Win Pack](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/2.4.11/opencv-2.4.11.exe/download), install the SDK to C:\.<br/>
+5.Build the source code with Visual Studio 2010 or Visual Studio Community 2017.<br/>
 <br/>
 Click the image to watch kinect mocap demo:<br/>
 [![Kinect Mocap Demo](video-cover.png)](https://youtu.be/4x8NyXuXZWI "Kinect Mocap Demo")
