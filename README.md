@@ -1,6 +1,6 @@
 ![](mocap.png)
 # kinect-openni-bvh-saver
-# Note: If you want an enhanced version for Windows platform, go to [http://www.mesh-online.net/mocap.html](http://www.mesh-online.net/mocap.html), the enhanced version can use multiple Kinect sensors for Xbox 360, thus captures true 360-degree range of motions in realtime.<br/>
+## Note: If you want an enhanced version for Windows platform, go to [http://www.mesh-online.net/mocap.html](http://www.mesh-online.net/mocap.html), the enhanced version can use multiple Kinect sensors for Xbox 360, thus captures true 360-degree range of motions in realtime.<br/>
 <br/>
 This project is based on OpenNI2, NITE2, and OpenCV2, it will automatically save many skeleton animation clips to bvh files.<br/>
 <br/>
