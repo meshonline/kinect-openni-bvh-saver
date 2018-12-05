@@ -37,7 +37,8 @@ Xcode 7.3.1
 1.Git clone [openni-nite-opencv-xcode](https://github.com/rishadbharucha/openni-nite-opencv-xcode).<br/>
 2.Install libpng, OpenNI2, OpenCV2 from source code, via macport or homebrew.<br/>
 3.Copy all the source codes to 'openni-nite-opencv-xcode/OpenNI+NITE+OpenCV', and add them to the project.<br/>
-4.Copy /usr/local/lib/OpenNI2-FreenectDriver/libFreenectDriver.0.5.0.dylib to 'openni-nite-opencv-xcode/OpenNI2/Drivers/libFreenectDriver.dylib', then add the filename to Xcode's 'Targets->Build Phases->Copy Files(5 items)', ensure that the Subpath is 'OpenNI2/Drivers'.<br/>
+4.Copy /usr/local/lib/OpenNI2-FreenectDriver/libFreenectDriver.0.5.0.dylib to 'openni-nite-opencv-xcode/OpenNI2/Drivers/Samples/Bin/OpenNI2/libFreenectDriver.dylib', then add the filename to Xcode's 'Targets->Build Phases->Copy Files(5 items)', ensure that the Subpath is 'OpenNI2/Drivers'.<br/>
+![](openni-add-driver.jpg)<br/>
 5.Plug kinect for xbox 360 into USB port.<br/>
 6.Open the project, build and run.<br/>
 <br/>
